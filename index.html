@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +7,9 @@
 
 <meta name="description" content="ZYNEX builds tools, apps, games, AI and cloud solutions for the future.">
 <meta name="theme-color" content="#020617">
+
+<!-- QR LIBRARY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
@@ -66,11 +69,7 @@ body{
   background:linear-gradient(120deg,transparent,rgba(0,229,255,.4),transparent);
   transform:translateX(-100%);
 }
-
-.glass-btn:hover::before{
-  transform:translateX(100%);
-  transition:1s;
-}
+.glass-btn:hover::before{transform:translateX(100%);transition:1s}
 
 .glass-btn:hover{
   transform:scale(1.08) translateY(-6px);
@@ -107,7 +106,7 @@ body{
   .ecosystem{grid-template-columns:repeat(2,1fr)}
 }
 
-/* ===== TOOLS OVERLAY (SEPARATE SECTION) ===== */
+/* ===== TOOLS OVERLAY ===== */
 #toolsOverlay{
   position:fixed;
   inset:0;
@@ -117,12 +116,10 @@ body{
   overflow-y:auto;
   padding:40px 20px;
 }
-
 #toolsOverlay.active{
   display:block;
   animation:fadeIn .8s ease;
 }
-
 @keyframes fadeIn{
   from{opacity:0;transform:scale(.95)}
   to{opacity:1;transform:scale(1)}
@@ -146,7 +143,6 @@ body{
 }
 .close-btn:hover{background:#1E90FF;color:black}
 
-/* tools grid */
 .tools-grid{
   max-width:1000px;
   margin:auto;
@@ -158,7 +154,6 @@ body{
   .tools-grid{grid-template-columns:1fr}
 }
 
-/* tool glass card */
 .tool-card{
   padding:30px;
   border-radius:26px;
@@ -184,13 +179,11 @@ input,button{
   border-radius:10px;
   font-size:1rem;
 }
-
 input{
   background:rgba(2,6,23,.9);
   color:white;
   border:1px solid rgba(30,144,255,.6);
 }
-
 button{
   background:#1E90FF;
   color:white;
@@ -202,13 +195,14 @@ button:hover{background:#00E5FF}
 .copy-btn{background:#22c55e}
 .download-btn{background:#a855f7}
 
-#qrImg{
+/* QR BOX */
+#qrBox{
   display:none;
-  margin:15px auto 0;
-  width:180px;
   background:white;
-  padding:10px;
+  padding:12px;
   border-radius:12px;
+  width:200px;
+  margin:15px auto 0;
 }
 
 /* footer */
@@ -228,7 +222,6 @@ footer{margin-top:10px;font-size:.8rem;color:#64748b}
   <div class="tagline">Build the Future</div>
   <div class="divider"></div>
 
-  <!-- ZYNEX TOOLS -->
   <div class="glass-btn" onclick="openTools()">
     <h3>ZYNEX <span>TOOLS</span></h3>
     <p>Open powerful utilities</p>
@@ -242,7 +235,7 @@ footer{margin-top:10px;font-size:.8rem;color:#64748b}
   </div>
 </div>
 
-<!-- ===== TOOLS OVERLAY ===== -->
+<!-- TOOLS OVERLAY -->
 <div id="toolsOverlay">
   <div class="tools-header">
     <h2>ZYNEX <span style="color:#1E90FF">TOOLS</span></h2>
@@ -251,7 +244,7 @@ footer{margin-top:10px;font-size:.8rem;color:#64748b}
 
   <div class="tools-grid">
 
-    <!-- PASSWORD TOOL -->
+    <!-- PASSWORD -->
     <div class="tool-card">
       <h4>Password <span>Generator</span></h4>
       <p>Generate strong secure passwords</p>
@@ -261,13 +254,13 @@ footer{margin-top:10px;font-size:.8rem;color:#64748b}
       <button class="copy-btn" onclick="copyPass()">Copy</button>
     </div>
 
-    <!-- QR TOOL -->
+    <!-- REAL QR -->
     <div class="tool-card">
       <h4>QR Code <span>Generator</span></h4>
       <p>Create QR from any URL</p>
       <input type="text" id="qrText" placeholder="Enter URL">
       <button onclick="genQR()">Generate</button>
-      <img id="qrImg">
+      <div id="qrBox"></div>
       <button class="download-btn" onclick="downloadQR()">Download</button>
     </div>
 
@@ -281,14 +274,14 @@ footer{margin-top:10px;font-size:.8rem;color:#64748b}
 <footer>© 2026 ZYNEX. All rights reserved.</footer>
 
 <script>
+let qr;
+
 function future(){
   alert("🚧 In future upgrades");
 }
-
 function openTools(){
   document.getElementById("toolsOverlay").classList.add("active");
 }
-
 function closeTools(){
   document.getElementById("toolsOverlay").classList.remove("active");
 }
@@ -304,27 +297,40 @@ function genPass(){
 function copyPass(){
   let o=document.getElementById("passOut");
   if(!o.value)return;
-  o.select();document.execCommand("copy");
+  o.select();
+  document.execCommand("copy");
   alert("Password copied!");
 }
 
+/* REAL QR */
 function genQR(){
-  let t=document.getElementById("qrText").value;
-  if(!t)return;
-  let img=document.getElementById("qrImg");
-  img.src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+encodeURIComponent(t);
-  img.style.display="block";
+  const text=document.getElementById("qrText").value;
+  if(!text)return;
+
+  const box=document.getElementById("qrBox");
+  box.innerHTML="";
+  box.style.display="block";
+
+  qr=new QRCode(box,{
+    text:text,
+    width:180,
+    height:180,
+    colorDark:"#000",
+    colorLight:"#fff",
+    correctLevel:QRCode.CorrectLevel.H
+  });
 }
 
 function downloadQR(){
-  let img=document.getElementById("qrImg");
-  if(!img.src)return;
-  let a=document.createElement("a");
-  a.href=img.src;
-  a.download="zynex-qr.png";
-  a.click();
+  const canvas=document.querySelector("#qrBox canvas");
+  if(!canvas)return;
+
+  const link=document.createElement("a");
+  link.href=canvas.toDataURL("image/png");
+  link.download="zynex-qr.png";
+  link.click();
 }
 </script>
 
 </body>
-      </html>
+  </html>
